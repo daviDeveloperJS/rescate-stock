@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RescateStock</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!--<header class="encabezado">
+        <h1>RescateStock</h1>
+        <nav>
+            <a href="#">Inicio</a>
+
+            <a href="#">Productos</a>
+
+            <a href="#">Como funciona</a>
+                
+        </nav>
+        <button>Publicar alimento</button>
+    </header>-->
+    <div class="registroProductos">
+
+        <h1>Registrar Producto</h1>
+        <form>
+            <label for="input_nombre">Nombre del producto:
+                <input id="input_nombre" type="text" required>
+            </label><br>
+
+            <label for="input_cantidad">Cantidad: 
+                <input 
+                    id="input_cantidad"
+                    type="text" 
+                    min="1" 
+                    step="1" 
+                    required>
+            </label><br>
+
+
+            <label for="input_precio">Precio normal:
+                <input 
+                    id="input_precio" 
+                    type="text" 
+                    min="0.01"
+                    step="0.01"
+                    required>
+            </label><br>
+
+            <label for="input_vencimiento">Vencimiento
+                <input id="input_vencimiento" type="date" required>
+            </label><br>
+
+            <button id="btn_agregarProducto">Agregar Producto</button>
+        </form>
+        <p id="parrafo"></p>
+        <section id="lista_productos"></section>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

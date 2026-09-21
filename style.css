@@ -1,0 +1,84 @@
+/* Estilos generales de toda la página */
+body {
+    /* Define la tipografía */
+    font-family: Arial, Helvetica, sans-serif;
+
+    /* Elimina el margen que agrega el navegador automáticamente */
+    margin: 0;
+}
+
+/* Contenedor principal del encabezado */
+.encabezado {
+    /* Coloca el título, la navegación y el botón en una fila */
+    display: flex;
+
+    /* Separa los elementos principales:
+       título a la izquierda,
+       navegación al centro
+       y botón a la derecha */
+    justify-content: space-between;
+
+    /* Centra verticalmente los elementos */
+    align-items: center;
+
+    /* Establece el color de fondo del encabezado */
+    background-color: rgb(152, 207, 97);
+
+    /* Crea espacio interior:
+       10px arriba y abajo,
+       20px a la izquierda y derecha */
+    padding: 10px 20px;
+}
+
+/* Organiza los enlaces de la navegación */
+.encabezado nav {
+    /* Coloca los enlaces en una misma fila */
+    display: flex;
+
+    /* Deja 20px de separación entre los enlaces */
+    gap: 20px;
+}
+
+/* Modifica los enlaces que están dentro de la navegación */
+.encabezado nav a {
+    /* Elimina el subrayado de los enlaces */
+    text-decoration: none;
+
+    /* Cambia el color del texto */
+    color: rgb(50, 47, 47);
+
+    /* Crea espacio interno alrededor del texto */
+    padding: 10px;
+}
+
+/* Modifica únicamente el título del encabezado */
+.encabezado h1 {
+    /* Elimina el margen automático del título */
+    margin: 0;
+
+    /* Cambia el tamaño del texto */
+    font-size: 30px;
+
+    /* Establece un color verde oscuro */
+    color: rgb(14, 56, 14);
+}
+
+/* Modifica el botón del encabezado */
+.encabezado button {
+    /* Establece el fondo verde */
+    background-color: green;
+
+    /* Cambia el texto a blanco */
+    color: white;
+
+    /* Elimina el borde predeterminado */
+    border: none;
+
+    /* Redondea las esquinas */
+    border-radius: 30px;
+
+    /* Crea espacio interior:
+       10px arriba y abajo,
+       18px a la izquierda y derecha */
+    padding: 10px 18px;
+}
