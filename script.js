@@ -49,6 +49,8 @@ function agregarProducto(){
         
         const urgencia= determinarUrgencia(calculoDias)
 
+        const promocion= recomendarPromocion(calculoDias,cantidad)
+
         const objeto_producto={
             Nombre: input_nombre.value.trim(),
             Cantidad:cantidad,
@@ -56,6 +58,7 @@ function agregarProducto(){
             Vencimiento: input_vencimiento.value,
             diasRestantes: calculoDias,
             Urgencia: urgencia,
+            Promocion: promocion,
         }
         arrayProductos.push(objeto_producto)
         mostrarProductos()
@@ -73,7 +76,13 @@ const division_productos=document.querySelector('#lista_productos')
 
 function mostrarProductos(){ //mostrar el array
     division_productos.textContent=""
-    arrayProductos.forEach((e)=>{
+
+
+    const arreglo_ordenado_copia=[...arrayProductos].sort((a,b)=>{
+        return a.diasRestantes-b.diasRestantes
+    })
+
+    arreglo_ordenado_copia.forEach((e)=>{
         const div_div_productos=document.createElement("div")
 
         const nombre=document.createElement("h2")
@@ -82,13 +91,16 @@ function mostrarProductos(){ //mostrar el array
         const vencimiento=document.createElement("p")
         const parrafo_dias_vencimiento=document.createElement("p")
         const urgencia_vencimiento=document.createElement("p")
+        const recomendacion=document.createElement("p")
 
+        
         nombre.textContent="Nombre: "+e.Nombre
         cantidad.textContent="Cantidad: "+ e.Cantidad
-        PrecioNormal.textContent="Precio Normal: "+e.PrecioNormal
+        PrecioNormal.textContent="Precio Normal S/: "+e.PrecioNormal
         vencimiento.textContent="Vencimiento: "+e.Vencimiento
         parrafo_dias_vencimiento.textContent="Dias restantes para su vencimiento: "+e.diasRestantes
         urgencia_vencimiento.textContent="Urgencia clasificada: "+e.Urgencia
+        recomendacion.textContent="Promocion: "+e.Promocion
 
         div_div_productos.appendChild(nombre)
         div_div_productos.appendChild(cantidad)
@@ -96,6 +108,7 @@ function mostrarProductos(){ //mostrar el array
         div_div_productos.appendChild(vencimiento)
         div_div_productos.appendChild(parrafo_dias_vencimiento)
         div_div_productos.appendChild(urgencia_vencimiento)
+        div_div_productos.appendChild(recomendacion)
 
         division_productos.appendChild(div_div_productos)
 
@@ -131,7 +144,69 @@ function determinarUrgencia(diasRestantes){
         return "¡Critica!"
     }else if(diasRestantes<=3){
         return "¡ALTA!"
-    }else{ 
-        return "¡MODERADA!"
+    }else if (diasRestantes <= 7) {
+        return "¡MODERADA!";
+    } else {
+        return "¡BAJA!";
+    }
+}
+
+function recomendarPromocion(diasRestantes, cantidadStock) {
+    if (diasRestantes < 0) {
+        return "Producto vencido";
+
+    } else if (diasRestantes <= 1 && cantidadStock >= 20) {
+        return "Liquidación: 60 % de descuento";
+
+    } else if (
+        diasRestantes <= 1 &&
+        cantidadStock >= 10 &&
+        cantidadStock <= 19
+    ) {
+        return "Liquidación: 50 % de descuento";
+
+    } else if (
+        diasRestantes <= 1 &&
+        cantidadStock >= 1 &&
+        cantidadStock <= 9
+    ) {
+        return "Descuento del 40 %";
+
+    } else if (diasRestantes <= 3 && cantidadStock >= 20) {
+        return "Promoción 2×1";
+
+    } else if (
+        diasRestantes <= 3 &&
+        cantidadStock >= 10 &&
+        cantidadStock <= 19
+    ) {
+        return "Descuento del 35 %";
+
+    } else if (
+        diasRestantes <= 3 &&
+        cantidadStock >= 1 &&
+        cantidadStock <= 9
+    ) {
+        return "Descuento del 25 %";
+
+    } else if (diasRestantes <= 7 && cantidadStock >= 20) {
+        return "Descuento del 25 %";
+
+    } else if (
+        diasRestantes <= 7 &&
+        cantidadStock >= 10 &&
+        cantidadStock <= 19
+    ) {
+        return "Descuento del 20 %";
+
+    } else if (
+        diasRestantes <= 7 &&
+        cantidadStock >= 1 &&
+        cantidadStock <= 9
+    ) {
+        return "Descuento del 15 %";
+
+    } else {
+        return "Sin promoción urgente";
     }
 }
