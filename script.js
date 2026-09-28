@@ -50,6 +50,8 @@ function agregarProducto(){
         const urgencia= determinarUrgencia(calculoDias)
 
         const promocion= recomendarPromocion(calculoDias,cantidad)
+    
+        const ahorroyDescuento=descuento_ahorro(promocion,precio)
 
         const objeto_producto={
             Nombre: input_nombre.value.trim(),
@@ -59,6 +61,7 @@ function agregarProducto(){
             diasRestantes: calculoDias,
             Urgencia: urgencia,
             Promocion: promocion,
+            ahorroDescuento: ahorroyDescuento
         }
         arrayProductos.push(objeto_producto)
         mostrarProductos()
@@ -92,15 +95,28 @@ function mostrarProductos(){ //mostrar el array
         const parrafo_dias_vencimiento=document.createElement("p")
         const urgencia_vencimiento=document.createElement("p")
         const recomendacion=document.createElement("p")
+        const precioFinalCalculo=document.createElement("p")
+        const descuentoAhorrado=document.createElement("p")
+        const mensaje_2x1=document.createElement("p")
 
-        
         nombre.textContent="Nombre: "+e.Nombre
         cantidad.textContent="Cantidad: "+ e.Cantidad
-        PrecioNormal.textContent="Precio Normal S/: "+e.PrecioNormal
+        PrecioNormal.textContent="Precio Normal S/: "+e.PrecioNormal.toFixed(2)
         vencimiento.textContent="Vencimiento: "+e.Vencimiento
         parrafo_dias_vencimiento.textContent="Dias restantes para su vencimiento: "+e.diasRestantes
         urgencia_vencimiento.textContent="Urgencia clasificada: "+e.Urgencia
-        recomendacion.textContent="Promocion: "+e.Promocion
+        recomendacion.textContent="Promocion: "+e.Promocion.descripcion
+        if (e.Promocion.tipo === "2x1") {
+        precioFinalCalculo.textContent ="Precio por 2 unidades: S/ " +e.ahorroDescuento.precioFinalProducto.toFixed(2)
+        mensaje_2x1.textContent ="Promoción 2x1: " + e.ahorroDescuento.Texto
+
+        div_div_productos.appendChild(mensaje_2x1)
+        }else{
+            precioFinalCalculo.textContent="Precio Final S/: "+e.ahorroDescuento.precioFinalProducto.toFixed(2)
+        }
+        descuentoAhorrado.textContent="Dinero ahorrado S/: "+e.ahorroDescuento.Descuento.toFixed(2)
+        
+
 
         div_div_productos.appendChild(nombre)
         div_div_productos.appendChild(cantidad)
@@ -109,8 +125,11 @@ function mostrarProductos(){ //mostrar el array
         div_div_productos.appendChild(parrafo_dias_vencimiento)
         div_div_productos.appendChild(urgencia_vencimiento)
         div_div_productos.appendChild(recomendacion)
+        div_div_productos.appendChild(precioFinalCalculo)
+        div_div_productos.appendChild(descuentoAhorrado)
 
         division_productos.appendChild(div_div_productos)
+
 
     })
 }
@@ -151,62 +170,110 @@ function determinarUrgencia(diasRestantes){
     }
 }
 
+function descuento_ahorro(promocion, precioNormall) {
+    if (promocion.tipo === "vencido") {
+        return null;
+    }
+
+    if (promocion.tipo === "2x1") {
+        return {
+            precioFinalProducto: precioNormall,
+            Descuento: precioNormall,
+            Texto: "Te llevas 2 por el precio de 1",
+            unidades: 2
+
+        };
+    }
+
+    if (promocion.tipo === "ninguna") {
+        return {
+            precioFinalProducto: precioNormall,
+            Descuento: 0,
+            unidades: 1
+        };
+    }
+
+    if (promocion.tipo === "descuento") {
+        const descuento = Number(
+            (precioNormall * promocion.porcentaje / 100).toFixed(2)
+        );
+
+        const precioFinal = Number(
+            (precioNormall - descuento).toFixed(2)
+        );
+
+        return {
+            precioFinalProducto: precioFinal,
+            Descuento: descuento,
+            unidades: 1
+        };
+    }
+
+    throw new Error("Tipo de promoción no reconocido");
+}
+
 function recomendarPromocion(diasRestantes, cantidadStock) {
     if (diasRestantes < 0) {
-        return "Producto vencido";
+        return {
+            tipo: "vencido",
+            porcentaje: 0,
+            descripcion: "Producto vencido"
+        }
+    }
 
-    } else if (diasRestantes <= 1 && cantidadStock >= 20) {
-        return "Liquidación: 60 % de descuento";
+    let porcentaje
+    let descripcion
 
-    } else if (
-        diasRestantes <= 1 &&
-        cantidadStock >= 10 &&
-        cantidadStock <= 19
-    ) {
-        return "Liquidación: 50 % de descuento";
+    if (diasRestantes <= 1) {
+        if (cantidadStock >= 20) {
+            porcentaje = 60
+            descripcion = "Liquidación: 60 % de descuento"
+        } else if (cantidadStock >= 10) {
+            porcentaje = 50
+            descripcion = "Liquidación: 50 % de descuento"
+        } else {
+            porcentaje = 40
+            descripcion = "Descuento del 40 %"
+        }
 
-    } else if (
-        diasRestantes <= 1 &&
-        cantidadStock >= 1 &&
-        cantidadStock <= 9
-    ) {
-        return "Descuento del 40 %";
+    } else if (diasRestantes <= 3) {
+        if (cantidadStock >= 20) {
+            return {
+                tipo: "2x1",
+                porcentaje: 0,
+                descripcion: "Promoción 2x1"
+            }
+        } else if (cantidadStock >= 10) {
+            porcentaje = 35
+            descripcion = "Descuento del 35 %"
+        } else {
+            porcentaje = 25
+            descripcion = "Descuento del 25 %"
+        }
 
-    } else if (diasRestantes <= 3 && cantidadStock >= 20) {
-        return "Promoción 2×1";
-
-    } else if (
-        diasRestantes <= 3 &&
-        cantidadStock >= 10 &&
-        cantidadStock <= 19
-    ) {
-        return "Descuento del 35 %";
-
-    } else if (
-        diasRestantes <= 3 &&
-        cantidadStock >= 1 &&
-        cantidadStock <= 9
-    ) {
-        return "Descuento del 25 %";
-
-    } else if (diasRestantes <= 7 && cantidadStock >= 20) {
-        return "Descuento del 25 %";
-
-    } else if (
-        diasRestantes <= 7 &&
-        cantidadStock >= 10 &&
-        cantidadStock <= 19
-    ) {
-        return "Descuento del 20 %";
-
-    } else if (
-        diasRestantes <= 7 &&
-        cantidadStock >= 1 &&
-        cantidadStock <= 9
-    ) {
-        return "Descuento del 15 %";
+    } else if (diasRestantes <= 7) {
+        if (cantidadStock >= 20) {
+            porcentaje = 25
+            descripcion = "Descuento del 25 %"
+        } else if (cantidadStock >= 10) {
+            porcentaje = 20
+            descripcion = "Descuento del 20 %"
+        } else {
+            porcentaje = 15
+            descripcion = "Descuento del 15 %"
+        }
 
     } else {
-        return "Sin promoción urgente";
+        return {
+            tipo: "ninguna",
+            porcentaje: 0,
+            descripcion: "Sin promoción urgente"
+        }
+    }
+
+    return {
+        tipo: "descuento",
+        porcentaje: porcentaje,
+        descripcion: descripcion
     }
 }
