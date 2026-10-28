@@ -3,6 +3,7 @@ import { descuento_ahorro } from "./calcularDescuento.js";
 import { recomendarPromocion } from "./recomendarPromocion.js";
 import { calcularDias } from "./calcularDias.js";
 import { determinarUrgencia } from "./determinarUrgencia.js";
+import {validarProducto} from "./validarProducto.js"
 
 // INPUTS
 const input_nombre = document.querySelector("#input_nombre");
@@ -20,66 +21,41 @@ const parrafo_registro_producto = document.querySelector("#parrafo");
 const arrayProductos = [];
 
 function agregarProducto() {
+    const calculoDias = calcularDias(input_vencimiento.value);
+    const error=validarProducto(
+        input_nombre.value,
+        input_cantidad.value,
+        input_precio.value,
+        calculoDias,
+    )
+    if(error!==""){
+        parrafo_registro_producto.textContent = error;
+        return;
+    }
+
+    parrafo_registro_producto.textContent = "";
+
     const cantidad = Number(input_cantidad.value);
     const precio = Number(input_precio.value);
+    const urgencia = determinarUrgencia(calculoDias);
+    const promocion = recomendarPromocion(calculoDias, cantidad);
+    const ahorroyDescuento = descuento_ahorro(promocion, precio);
 
-    if (input_nombre.value.trim() === "") {
-        parrafo_registro_producto.textContent = "El nombre está vacío!";
-        return;
-    } else if (
-        input_cantidad.value === "" ||
-        !Number.isInteger(cantidad) ||
-        cantidad <= 0
-    ) {
-        parrafo_registro_producto.textContent =
-            "Ingrese una cantidad mayor a 0 y sin decimales!";
-        return;
-    } else if (
-        input_precio.value === "" ||
-        precio <= 0 ||
-        !Number.isFinite(precio)
-    ) {
-        parrafo_registro_producto.textContent =
-            "El precio debe ser mayor a 0 y sin letras!";
-        return;
-    } else if (input_vencimiento.value === "") {
-        parrafo_registro_producto.textContent =
-            "Debe ingresar una fecha válida";
-        return;
-    }
+    const objeto_producto = {
+        Nombre: input_nombre.value.trim(),
+        Cantidad: cantidad,
+        PrecioNormal: precio,
+        Vencimiento: input_vencimiento.value,
+        diasRestantes: calculoDias,
+        Urgencia: urgencia,
+        Promocion: promocion,
+        ahorroDescuento: ahorroyDescuento
+    };
 
-    const calculoDias = calcularDias(input_vencimiento.value);
-
-    if (!Number.isFinite(calculoDias)) {
-        parrafo_registro_producto.textContent =
-            "La fecha ingresada no es válida";
-        return;
-    } else if (calculoDias < 0) {
-        parrafo_registro_producto.textContent =
-            "No se puede registrar un producto vencido";
-        return;
-    } else {
-        parrafo_registro_producto.textContent = "";
-
-        const urgencia = determinarUrgencia(calculoDias);
-        const promocion = recomendarPromocion(calculoDias, cantidad);
-        const ahorroyDescuento = descuento_ahorro(promocion, precio);
-
-        const objeto_producto = {
-            Nombre: input_nombre.value.trim(),
-            Cantidad: cantidad,
-            PrecioNormal: precio,
-            Vencimiento: input_vencimiento.value,
-            diasRestantes: calculoDias,
-            Urgencia: urgencia,
-            Promocion: promocion,
-            ahorroDescuento: ahorroyDescuento
-        };
-
-        arrayProductos.push(objeto_producto);
-        mostrarProductos();
-        limpiar_formulario();
-    }
+    arrayProductos.push(objeto_producto);
+    mostrarProductos();
+    limpiar_formulario();
+    
 }
 
 btn_agregarProducto.addEventListener("click", (e) => {
