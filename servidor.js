@@ -1,5 +1,9 @@
 const express=require("express")
 
+const path=require("node:path")
+
+console.log("Archivo ejecutado:", __filename);
+
 const productos = [
     {
         id: 1,
@@ -21,6 +25,35 @@ const servidor=express()
 
 //express pueda interpretar las solicitudes con formato json de parte del cliente 
 servidor.use(express.json())
+
+servidor.get("/",(req,res)=>{
+    return res.sendFile(path.join(__dirname,"index.html"))
+})
+
+servidor.get("/script.js",(req,res)=>{
+    return res.sendFile(path.join(__dirname,"script.js"))
+})
+
+servidor.get("/style.css",(req,res)=>{
+    return res.sendFile(path.join(__dirname,"style.css"))
+})
+
+// Archivos del frontend que el navegador necesita importar.
+const archivosFrontend = [
+    "calcularDescuento.js",
+    "calcularDias.js",
+    "determinarUrgencia.js",
+    "mostrarProductos.js",
+    "recomendarPromocion.js",
+    "validarProducto.js"
+];
+
+// Crea una ruta para cada archivo de la lista.
+archivosFrontend.forEach((archivo) => {
+    servidor.get("/" + archivo, (req, res) => {
+        return res.sendFile(path.join(__dirname, archivo));
+    });
+});
 
 //post
 servidor.post("/productos",(req,res)=>{
@@ -92,11 +125,11 @@ servidor.post("/productos",(req,res)=>{
     res.status(201).json(nuevoProducto);
 })
 
-servidor.get("/",(req,res)=>{
+/*servidor.get("/",(req,res)=>{
     return res.status(200).json({
         mensaje: "Bienvenido a la API de RescateStock"
     });
-})
+})*/
 
 servidor.get("/productos",(req,res)=>{
     return res.status(200).json(productos)
@@ -127,7 +160,13 @@ servidor.get("/productos/:id",(req,res)=>{
 
 })
 
-servidor.use("",(req,res)=>{
+servidor.get("/prueba-servidor", (req, res) => {
+    return res.json({
+        mensaje: "RescateStock: versión actual"
+    });
+});
+
+servidor.use((req,res)=>{
     return res.status(404).json({
         error:"Ruta no encontrada"
     })
