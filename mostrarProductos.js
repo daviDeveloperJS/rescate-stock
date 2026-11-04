@@ -1,6 +1,42 @@
 import { descuento_ahorro } from "./calcularDescuento.js";
+import { calcularDias } from "./calcularDias.js";
+import { determinarUrgencia } from "./determinarUrgencia.js";
+import { recomendarPromocion } from "./recomendarPromocion.js";
 const division_productos = document.querySelector("#lista_productos");
 
+async function cargarProductos() {
+    try{
+        const peticion=await fetch("http://localhost:3000/productos",{
+            method:"GET",
+            headers: {"Content-Type":"application/json"}
+        })
+        const datos=await peticion.json()
+
+        if(!peticion.ok){
+            throw new Error("No pudimos obtener la peticion satisfactoriamente")
+        }
+        datos.forEach((producto) => {
+            producto.diasRestantes = calcularDias(producto.Vencimiento);
+
+            producto.Urgencia = determinarUrgencia(producto.diasRestantes);
+
+            producto.Promocion = recomendarPromocion(
+                producto.diasRestantes,
+                producto.Cantidad
+            );
+
+            producto.ahorroDescuento = descuento_ahorro(
+                producto.Promocion,
+                producto.PrecioNormal
+            );
+        });
+        console.log("Primer producto recibido:", datos[0]);
+        mostrarProductos(datos)
+
+    }catch(error){
+        console.log( error.message)
+    }
+}
 
 export function mostrarProductos(arrayProductos) {
     division_productos.textContent = "";
@@ -422,3 +458,5 @@ export function mostrarProductos(arrayProductos) {
         division_productos.appendChild(div_div_productos);
     });
 }
+
+cargarProductos()
