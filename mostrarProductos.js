@@ -2,9 +2,10 @@ import { descuento_ahorro } from "./calcularDescuento.js";
 import { calcularDias } from "./calcularDias.js";
 import { determinarUrgencia } from "./determinarUrgencia.js";
 import { recomendarPromocion } from "./recomendarPromocion.js";
+
 const division_productos = document.querySelector("#lista_productos");
 
-async function cargarProductos() {
+export async function cargarProductos() {
     try{
         const peticion=await fetch("http://localhost:3000/productos",{
             method:"GET",
