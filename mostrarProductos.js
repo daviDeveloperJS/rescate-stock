@@ -79,9 +79,14 @@ export function mostrarProductos(arrayProductos) {
         urgencia_vencimiento.textContent =
             "Urgencia clasificada: " + e.Urgencia;
 
-        recomendacion.textContent =
-            "Promoción sugerida: " + e.Promocion.descripcion;
+        if(e.Promocion.tipo==="vencido"){
+                recomendacion.textContent = "Producto vencido!"
 
+                div_div_productos.append(nombre,cantidad,PrecioNormal,vencimiento,parrafo_dias_vencimiento,urgencia_vencimiento,recomendacion)
+
+                return division_productos.appendChild(div_div_productos)
+
+            }
         // Recupera los mensajes según la decisión guardada.
         if (
             e.decisionPromocion === "aceptada" ||
