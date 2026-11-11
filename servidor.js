@@ -125,6 +125,32 @@ servidor.post("/productos",(req,res)=>{
     res.status(201).json(nuevoProducto);
 })
 
+servidor.patch("/productos/:id",(req,res)=>{
+
+    const id=Number(req.params.id)
+
+    if(!Number.isInteger(id)||id<=0){
+        return res.status(400).json({
+            error: "ID invalido!"
+        });
+    }
+    const array=productos.find((e)=>{
+        return e.id===id
+    })
+
+    if(array===undefined){
+        return res.status(400).json({
+            error: "ID invalido!"
+        });
+    }
+
+    const cantidad=req.body?.Cantidad
+    array.Cantidad=cantidad
+
+    return res.status(201).json(array)
+
+})
+
 /*servidor.get("/",(req,res)=>{
     return res.status(200).json({
         mensaje: "Bienvenido a la API de RescateStock"

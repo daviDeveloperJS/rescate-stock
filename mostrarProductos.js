@@ -39,6 +39,32 @@ export async function cargarProductos() {
     }
 }
 
+async function actualizarCantidad(id,cantidad){
+    try{
+        const peticion=await fetch("/productos/"+id,{
+            method:"PATCH",
+            headers:{"Content-Type":"application/json"},
+            body: JSON.stringify({
+                Cantidad: cantidad
+            })
+        })
+
+        const respuesta=await peticion.json()
+
+        if(!peticion.ok){
+            throw new Error(
+                "Estado " + peticion.status + ": " + respuesta.error
+            );
+        }
+
+        console.log("Cantidad modificada: "+cantidad)
+        await cargarProductos()
+
+    }catch(error){
+        console.log(error.message)
+    }
+}
+
 export function mostrarProductos(arrayProductos) {
     division_productos.textContent = "";
 
@@ -50,6 +76,10 @@ export function mostrarProductos(arrayProductos) {
         const div_div_productos = document.createElement("div");
         const nombre = document.createElement("h2");
         const cantidad = document.createElement("p");
+        //input cantidad
+        const inputCantidad=document.createElement("input")
+        inputCantidad.value=e.Cantidad
+        //
         const PrecioNormal = document.createElement("p");
         const vencimiento = document.createElement("p");
         const parrafo_dias_vencimiento = document.createElement("p");
@@ -59,7 +89,9 @@ export function mostrarProductos(arrayProductos) {
         const precioFinalCalculo = document.createElement("p");
         const descuentoAhorrado = document.createElement("p");
         const mensaje_2x1 = document.createElement("p");
-
+        //boton para el patch
+        const btn_editarCantidad=document.createElement("button")
+        //
         const btn_revisarPromocion = document.createElement("button");
         const btn_aceptarPromocion = document.createElement("button");
         const btn_modificarPromocion = document.createElement("button");
@@ -67,6 +99,16 @@ export function mostrarProductos(arrayProductos) {
 
         nombre.textContent = "Nombre: " + e.Nombre;
         cantidad.textContent = "Cantidad: " + e.Cantidad;
+
+        //agregamos el boton al costado de cantidad
+        btn_editarCantidad.textContent="Editar Cantidad"
+
+        btn_editarCantidad.addEventListener("click",async()=>{
+            const cantidadInput=Number(inputCantidad.value)
+            console.log("ID: "+e.id+"Cantidad:"+cantidadInput)
+
+            await actualizarCantidad(e.id,cantidadInput)
+        })
 
         PrecioNormal.textContent =
             "Precio Normal S/: " + e.PrecioNormal.toFixed(2);
@@ -435,6 +477,10 @@ export function mostrarProductos(arrayProductos) {
         // Este bloque determina el orden de la tarjeta.
         div_div_productos.appendChild(nombre);
         div_div_productos.appendChild(cantidad);
+        //
+        div_div_productos.appendChild(btn_editarCantidad)
+        div_div_productos.appendChild(inputCantidad)
+        //
         div_div_productos.appendChild(PrecioNormal);
         div_div_productos.appendChild(vencimiento);
         div_div_productos.appendChild(parrafo_dias_vencimiento);
