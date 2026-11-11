@@ -8,7 +8,7 @@ async function postProductos(){
                 Nombre: "yogur",
                 Cantidad: 2,
                 PrecioNormal: 6.5,
-                Vencimiento: "2026-11-10"
+                Vencimiento: "2026-11-20"
             })
         })
         const aplicado = await respuesta.json();
