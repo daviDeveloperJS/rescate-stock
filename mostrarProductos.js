@@ -65,6 +65,25 @@ async function actualizarCantidad(id,cantidad){
     }
 }
 
+async function eliminarProducto(id){
+    try{
+        const peticion=await fetch("/productos/"+id,{
+            method: "DELETE"
+        })
+
+        if (!peticion.ok) {
+            const datos = await peticion.json();
+            throw new Error(datos.error || "No se pudo eliminar el producto.");
+        }
+
+        // El DELETE devuelve 204, sin cuerpo. El GET trae la lista nueva.
+        await cargarProductos();
+
+    }catch(error){
+        console.log(error.message)
+    }
+}
+
 export function mostrarProductos(arrayProductos) {
     division_productos.textContent = "";
 
@@ -120,6 +139,7 @@ export function mostrarProductos(arrayProductos) {
 
         urgencia_vencimiento.textContent =
             "Urgencia clasificada: " + e.Urgencia;
+
 
         if(e.Promocion.tipo==="vencido"){
                 recomendacion.textContent = "Producto vencido!"
@@ -194,6 +214,12 @@ export function mostrarProductos(arrayProductos) {
                     e.ahorroDescuento.Descuento.toFixed(2);
             }
         }
+
+        const botonEliminar=document.createElement("button")
+        botonEliminar.textContent="Eliminar Producto"
+        botonEliminar.addEventListener("click",async()=>{
+            await eliminarProducto(e.id)
+        })
 
         const opciones_recomendacion = document.createElement("div");
         opciones_recomendacion.className = "opciones-recomendacion";
@@ -488,6 +514,7 @@ export function mostrarProductos(arrayProductos) {
         div_div_productos.appendChild(recomendacion);
         div_div_productos.appendChild(promocionAplicada);
         div_div_productos.appendChild(precioFinalCalculo);
+        div_div_productos.appendChild(botonEliminar)
 
         // El mensaje del 2x1 se agrega una sola vez,
         // después del precio.

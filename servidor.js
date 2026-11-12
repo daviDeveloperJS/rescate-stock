@@ -151,6 +151,28 @@ servidor.patch("/productos/:id",(req,res)=>{
 
 })
 
+servidor.delete("/productos/:id",(req,res)=>{
+    const id=Number(req.params.id)
+
+    if (!Number.isInteger(id) || id <= 0) {
+        return res.status(400).json({ error: "El ID no es válido." });
+    }
+
+    const posicion=productos.findIndex((e)=>{
+        return e.id===id
+    })
+
+    if (posicion === -1) {
+        return res.status(404).json({ error: "Pedido no encontrado." });
+    }
+
+    productos.splice(posicion, 1);
+
+    return res.status(204).end();
+
+
+})
+
 /*servidor.get("/",(req,res)=>{
     return res.status(200).json({
         mensaje: "Bienvenido a la API de RescateStock"
