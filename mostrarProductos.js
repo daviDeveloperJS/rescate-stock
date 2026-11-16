@@ -31,7 +31,10 @@ export async function cargarProductos() {
                 producto.PrecioNormal
             );
         });
-        console.log("Primer producto recibido:", datos[0]);
+        for (let i = 0; i < datos.length; i++) {
+            console.log("Primer producto recibido:", datos[i]);
+        }
+        
         mostrarProductos(datos)
 
     }catch(error){
@@ -83,6 +86,36 @@ async function eliminarProducto(id){
         console.log(error.message)
     }
 }
+
+async function actualizarCantidadyNombre(id, cantidad, producto, precioNormal, vencimiento){
+    try {
+        // La barra separa la ruta del ID: /pedidos/1
+        const peticion = await fetch("/productos/" + id, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                Nombre: producto,
+                Cantidad: cantidad,
+                PrecioNormal: precioNormal,
+                Vencimiento: vencimiento
+            })
+        });
+
+        const datos = await peticion.json();
+
+        if (!peticion.ok) {
+            
+            throw new Error(datos.error || "No se pudo actualizar el pedido.");
+        }
+
+        console.log("Producto después de la edición:", datos);
+        await cargarProductos()
+
+    } catch (error) {
+        console.log(error.message)
+    }
+}
+await actualizarCantidadyNombre(1, 7, "Pan de avena", 10, "2026-11-20");
 
 export function mostrarProductos(arrayProductos) {
     division_productos.textContent = "";
@@ -537,5 +570,4 @@ export function mostrarProductos(arrayProductos) {
         division_productos.appendChild(div_div_productos);
     });
 }
-
 cargarProductos()

@@ -173,6 +173,62 @@ servidor.delete("/productos/:id",(req,res)=>{
 
 })
 
+servidor.put("/productos/:id",(req,res)=>{
+    const id=Number(req.params.id)
+
+    if(!Number.isInteger(id)||id<=0){
+        return res.status(400).json({
+            error:"Id invalido para el put"
+        })
+    }
+
+    const posicion=productos.findIndex((e)=>{
+        return e.id==id
+    })
+
+    if(posicion===-1){
+        return res.status(404).json({ error: "Pedido no encontrado." });
+    }
+
+    const { Nombre, Cantidad, PrecioNormal, Vencimiento } = req.body ?? {};
+
+    if (typeof Nombre !== "string" || Nombre.trim() === "") {
+        return res.status(400).json({ error: "Escribe el nombre del producto." });
+    }
+
+    if (!Number.isInteger(Cantidad) || Cantidad < 1) {
+        return res.status(400).json({ error: "La cantidad debe ser un entero positivo." });
+    }
+
+    if (!Number.isFinite(PrecioNormal) || PrecioNormal <= 0) {
+        return res.status(400).json({ error: "El precio debe ser un número mayor que cero." });
+    }
+
+    // Comprueba el formato y que la fecha exista en el calendario.
+    const fecha = new Date(`${Vencimiento}T00:00:00.000Z`);
+
+    if (
+        typeof Vencimiento !== "string" ||
+        !/^\d{4}-\d{2}-\d{2}$/.test(Vencimiento) ||
+        Number.isNaN(fecha.getTime()) ||
+        fecha.toISOString().slice(0, 10) !== Vencimiento
+    ) {
+        return res.status(400).json({ error: "Ingresa una fecha válida en formato AAAA-MM-DD." });
+    }
+
+    const productoActualizado = {
+        id,
+        Nombre: Nombre.trim(),
+        Cantidad,
+        PrecioNormal,
+        Vencimiento
+    };
+
+    productos[posicion] = productoActualizado;
+    return res.status(200).json(productoActualizado);
+
+})
+
 /*servidor.get("/",(req,res)=>{
     return res.status(200).json({
         mensaje: "Bienvenido a la API de RescateStock"
