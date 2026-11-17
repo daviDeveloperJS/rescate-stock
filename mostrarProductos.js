@@ -31,9 +31,8 @@ export async function cargarProductos() {
                 producto.PrecioNormal
             );
         });
-        for (let i = 0; i < datos.length; i++) {
-            console.log("Primer producto recibido:", datos[i]);
-        }
+        console.count("Listado recibido");
+        console.table(datos, ["id", "Nombre", "Cantidad", "PrecioNormal", "Vencimiento"]);
         
         mostrarProductos(datos)
 
@@ -108,14 +107,39 @@ async function actualizarCantidadyNombre(id, cantidad, producto, precioNormal, v
             throw new Error(datos.error || "No se pudo actualizar el pedido.");
         }
 
-        console.log("Producto después de la edición:", datos);
         await cargarProductos()
 
     } catch (error) {
         console.log(error.message)
     }
 }
-await actualizarCantidadyNombre(1, 7, "Pan de avena", 10, "2026-11-20");
+//await actualizarCantidadyNombre(1, 7, "Pan de avena", 10, "2026-11-20");
+
+async function guardarDecisionPromocion(id,decicionTomada){
+    try{
+        const peticion=await fetch("/productos/"+id,{
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                decisionPromocion:decicionTomada
+            })
+        })
+
+        const respuesta=await peticion.json()
+
+        if(!peticion.ok){
+            throw new Error(
+                "Estado " + peticion.status + ": " + respuesta.error
+            );
+        }
+        
+        await cargarProductos()
+
+    }catch(error){
+        console.log(error.message)
+    }
+
+}
 
 export function mostrarProductos(arrayProductos) {
     division_productos.textContent = "";
@@ -270,8 +294,8 @@ export function mostrarProductos(arrayProductos) {
             btn_mantenerPrecio.textContent = "Mantener precio original";
         });
 
-        btn_aceptarPromocion.addEventListener("click", (m) => {
-            e.decisionPromocion = "aceptada";
+        btn_aceptarPromocion.addEventListener("click", async(m) => {
+            await guardarDecisionPromocion(e.id, "aceptada");
 
             btn_revisarPromocion.remove();
             btn_aceptarPromocion.remove();
@@ -547,7 +571,7 @@ export function mostrarProductos(arrayProductos) {
         div_div_productos.appendChild(recomendacion);
         div_div_productos.appendChild(promocionAplicada);
         div_div_productos.appendChild(precioFinalCalculo);
-        div_div_productos.appendChild(botonEliminar)
+        
 
         // El mensaje del 2x1 se agrega una sola vez,
         // después del precio.
@@ -556,6 +580,7 @@ export function mostrarProductos(arrayProductos) {
         }
 
         div_div_productos.appendChild(descuentoAhorrado);
+        div_div_productos.appendChild(botonEliminar)
 
         // Revisar solo aparece cuando no hay una decisión final.
         if (

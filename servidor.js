@@ -17,7 +17,7 @@ const productos = [
         Nombre: "Leche",
         Cantidad: 5,
         PrecioNormal: 20,
-        Vencimiento: "2026-11-10"
+        Vencimiento: "2026-11-23"
     }
 ];
 
@@ -144,10 +144,34 @@ servidor.patch("/productos/:id",(req,res)=>{
         });
     }
 
-    const cantidad=req.body?.Cantidad
-    array.Cantidad=cantidad
+    const cantidad = req.body?.Cantidad;
+    const decision = req.body?.decisionPromocion;
 
-    return res.status(201).json(array)
+    if (cantidad === undefined && decision === undefined) {
+        return res.status(400).json({ error: "Envía una cantidad o una decisión." });
+    }
+
+    // Valida todo antes de modificar el producto.
+    if (cantidad !== undefined && (!Number.isInteger(cantidad) || cantidad <= 0)) {
+        return res.status(400).json({ error: "La cantidad debe ser un entero positivo." });
+    }
+
+    if (decision !== undefined && decision !== "aceptada") {
+        return res.status(400).json({ error: "La decisión no es válida." });
+    }
+
+    // Guarda únicamente lo que llegó en la petición.
+    if (cantidad !== undefined) {
+        array.Cantidad = cantidad;
+    }
+
+    if (decision !== undefined) {
+        array.decisionPromocion = decision;
+    }
+
+    return res.status(200).json(array);
+
+    
 
 })
 
@@ -169,7 +193,6 @@ servidor.delete("/productos/:id",(req,res)=>{
     productos.splice(posicion, 1);
 
     return res.status(204).end();
-
 
 })
 
