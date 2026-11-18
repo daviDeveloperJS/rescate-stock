@@ -141,6 +141,32 @@ async function guardarDecisionPromocion(id,decicionTomada){
 
 }
 
+async function modificarPromocion(id,decicionTomada,porcentaje){
+    try{
+        const peticion=await fetch("/productos/"+id,{
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                decisionPromocion:decicionTomada,
+                porcentaje: porcentaje
+            })
+        })
+
+        const respuesta=await peticion.json()
+
+        if(!peticion.ok){
+            throw new Error(
+                "Estado " + peticion.status + ": " + respuesta.error
+            );
+        }
+        
+        await cargarProductos()
+
+    }catch(error){
+        console.log(error.message)
+    }
+}
+
 export function mostrarProductos(arrayProductos) {
     division_productos.textContent = "";
 
@@ -209,7 +235,7 @@ export function mostrarProductos(arrayProductos) {
         // Recupera los mensajes según la decisión guardada.
         if (
             e.decisionPromocion === "aceptada" ||
-            e.decisionPromocion === "aplicada"
+            e.decisionPromocion === "modificada"
         ) {
             recomendacion.textContent = "Decisión: promoción aprobada";
             promocionAplicada.textContent =
@@ -379,7 +405,8 @@ export function mostrarProductos(arrayProductos) {
         const btn_aplicarModificacion = document.createElement("button");
         const parrafo_modificar = document.createElement("p");
 
-        btn_modificarPromocion.addEventListener("click", (m) => {
+        btn_modificarPromocion.addEventListener("click", async(m) => {
+            
             btn_aplicarModificacion.textContent = "Aplicar descuento";
 
             btn_revisarPromocion.remove();
@@ -393,9 +420,9 @@ export function mostrarProductos(arrayProductos) {
         });
 
         // Evento separado: se registra una sola vez por tarjeta.
-        btn_aplicarModificacion.addEventListener("click", () => {
+        btn_aplicarModificacion.addEventListener("click", async() => {
             const numero_modificar = Number(input_modificar.value);
-
+            
             btn_revisarPromocion.remove();
             btn_aceptarPromocion.remove();
             btn_modificarPromocion.remove();
@@ -409,7 +436,8 @@ export function mostrarProductos(arrayProductos) {
                 parrafo_modificar.textContent = "Ingrese un numero valido!";
                 div_div_productos.appendChild(parrafo_modificar);
             } else {
-                e.decisionPromocion = "aplicada";
+                e.decisionPromocion = "modificada";
+                await modificarPromocion(e.id,"modificada",numero_modificar)
 
                 parrafo_modificar.textContent = "";
                 label_modificar.remove();

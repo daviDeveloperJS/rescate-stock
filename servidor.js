@@ -146,6 +146,8 @@ servidor.patch("/productos/:id",(req,res)=>{
 
     const cantidad = req.body?.Cantidad;
     const decision = req.body?.decisionPromocion;
+    const porcentaje=req.body?.porcentaje
+    
 
     if (cantidad === undefined && decision === undefined) {
         return res.status(400).json({ error: "Envía una cantidad o una decisión." });
@@ -156,10 +158,13 @@ servidor.patch("/productos/:id",(req,res)=>{
         return res.status(400).json({ error: "La cantidad debe ser un entero positivo." });
     }
 
-    if (decision !== undefined && decision !== "aceptada") {
+    if (decision !== "aceptada" && decision !== "modificada") {
         return res.status(400).json({ error: "La decisión no es válida." });
     }
 
+    if (porcentaje !== undefined && (!Number.isInteger(porcentaje) || porcentaje <= 0)) {
+        return res.status(400).json({ error: "El porcentaje debe ser un entero positivo." });
+    }
     // Guarda únicamente lo que llegó en la petición.
     if (cantidad !== undefined) {
         array.Cantidad = cantidad;
@@ -169,9 +174,11 @@ servidor.patch("/productos/:id",(req,res)=>{
         array.decisionPromocion = decision;
     }
 
-    return res.status(200).json(array);
+    if(porcentaje!==undefined){
+        array.porcentaje=porcentaje
+    }
 
-    
+    return res.status(200).json(array);
 
 })
 
