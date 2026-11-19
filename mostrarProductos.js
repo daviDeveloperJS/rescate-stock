@@ -21,16 +21,30 @@ export async function cargarProductos() {
 
             producto.Urgencia = determinarUrgencia(producto.diasRestantes);
 
-            producto.Promocion = recomendarPromocion(
+            producto.promocionOriginal=recomendarPromocion(
                 producto.diasRestantes,
                 producto.Cantidad
             );
+
+            producto.Promocion=producto.promocionOriginal
+ 
+            if(producto.decisionPromocion==="modificada"&&producto.Promocion.tipo!=="vencido"){
+                producto.Promocion={
+                    tipo:"descuento",
+                    porcentaje: producto.porcentaje,
+                    descripcion: producto.porcentaje + " % de descuento"
+                }
+            }
 
             producto.ahorroDescuento = descuento_ahorro(
                 producto.Promocion,
                 producto.PrecioNormal
             );
+
+            
         });
+
+
         console.count("Listado recibido");
         console.table(datos, ["id", "Nombre", "Cantidad", "PrecioNormal", "Vencimiento"]);
         
